@@ -1,9 +1,10 @@
-import React from 'react';
+import React, {useState} from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { Pedometer } from 'expo-sensors';
-import {Button, SafeAreaView, Alert } from 'react-native';
+import {Button, SafeAreaView, Alert, TextInput, CheckBox} from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { Searchbar } from 'react-native-paper';
 
 const styles = StyleSheet.create({
   container: {
@@ -24,6 +25,7 @@ const styles = StyleSheet.create({
     borderBottomColor: '#737373',
     borderBottomWidth: StyleSheet.hairlineWidth,
   },
+
 });
 export class Ped extends React.Component{
   state = {
@@ -90,6 +92,102 @@ export class Ped extends React.Component{
     );
   }
 }
+
+export class SignUp extends React.Component {state = {
+    username: '', password: '', email: '', phone_number: '', isSelected: '', setSelection: '', checked: 'first',
+  };
+  
+  onChangeText = (key, val) => {
+    this.setState({ [key]: val })
+  }
+  signUp = async () => {
+    const { username, password, email, phone_number, checked } = this.state
+    try {
+      // here place your signup logic
+      console.log('user successfully signed up!: ')
+    } catch (err) {
+      console.log('error signing up: ', err)
+    }
+  }
+  render() {
+    return (
+      <View style={styles.container}>
+        <TextInput
+          style={styles.input}
+          placeholder='Username'
+          autoCapitalize="none"
+          placeholderTextColor='black'
+          onChangeText={val => this.onChangeText('username', val)}
+        />
+        <TextInput
+          style={styles.input}
+          placeholder='Password'
+          secureTextEntry={true}
+          autoCapitalize="none"
+          placeholderTextColor='black'
+          onChangeText={val => this.onChangeText('password', val)}
+        />
+        <TextInput
+          style={styles.input}
+          placeholder='Email'
+          autoCapitalize="none"
+          placeholderTextColor='black'
+          onChangeText={val => this.onChangeText('email', val)}
+        />
+        <TextInput
+          style={styles.input}
+          placeholder='Phone Number'
+          autoCapitalize="none"
+          placeholderTextColor='black'
+          onChangeText={val => this.onChangeText('phone_number', val)}
+        />
+        <TextInput
+          style={styles.input}
+          placeholder='Credit Card'
+          autoCapitalize="none"
+          placeholderTextColor='black'
+          onChangeText={val => this.onChangeText('credit_card', val)}
+          />
+        <Button
+        title = 'Active'
+        onPress = {this.signUp} 
+        />  
+        <Button
+          title='Not active'
+          onPress={this.signUp}
+        />
+    </View>
+
+    )
+  }
+
+}
+
+export class Groups extends React.Component{
+state = {
+    search: '',
+  };
+  updateSearch = (search) => {
+    this.setState({ search });
+  };
+
+  searchItems (searchr) {
+    console.log(JSON.stringify(searchr));
+  }
+  render() {
+    const { search } = this.state;
+
+    return (
+      <Searchbar
+        placeholder="Type Here..."
+        onChangeText={this.updateSearch}
+        value={search}
+        onIconPress = {(search) => this.searchItems(search)}
+      />
+    );
+  }
+}
+
 export default function App() {
   return (
     <NavigationContainer>
@@ -113,7 +211,7 @@ function HomeScreen(){
 function SettingsScreen() {
   return (
     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <Text>Settings!</Text>
+      <SignUp/>
     </View>
   );
 }
@@ -121,7 +219,7 @@ function SettingsScreen() {
 function GroupsScreen(){
   return(
     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <Text>Groups!</Text>
+      <Groups/>
     </View>
   );
 }
