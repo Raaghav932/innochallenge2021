@@ -164,25 +164,37 @@ export class SignUp extends React.Component {state = {
 }
 
 export class Groups extends React.Component{
-state = {
-    search: '',
-  };
+  constructor() {
+    super();
+    this.state = {
+      search: ''
+    };
+  }
+  
   updateSearch = (search) => {
-    this.setState({ search });
+      this.setState({search: search}, () => {
+      console.log(this.state.search);
+    });
+  };
+  // this.setState() actually creates a new thread and code continues. We can re-write as: 
+  updateSearchAsync = async (search) => {
+    await this.setState({search: search});
+    console.log(this.state.search);
   };
 
-  searchItems (searchr) {
-    console.log(JSON.stringify(searchr));
-  }
+  // searchItems (searchr) {
+  //   console.log(this.state.search);
+  // }
+
   render() {
-    const { search } = this.state;
+    // const { search } = this.state;
 
     return (
       <Searchbar
         placeholder="Type Here..."
-        onChangeText={this.updateSearch}
-        value={search}
-        onIconPress = {(search) => this.searchItems(search)}
+        onChangeText={this.updateSearchAsync}
+        value={this.state.search}
+        // onIconPress = {(search) => this.searchItems(search)}
       />
     );
   }
