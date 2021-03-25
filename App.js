@@ -1,3 +1,4 @@
+
 import React, {useState} from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { Pedometer } from 'expo-sensors';
@@ -8,6 +9,7 @@ import { Searchbar } from 'react-native-paper';
 import { ListItem, Avatar } from 'react-native-elements'
 import { ScrollView } from 'react-native';
 
+global.flag = true;
 async function f(url, data, method) {
      const opts = {
          method: method,
@@ -23,7 +25,7 @@ async function f(url, data, method) {
 
     const res = await fetch('http://innoc21backend.herokuapp.com'+url, opts)
     const datar = await res.json()
-    console.log(datar)
+    //console.log(datar)
     return datar
 }
 
@@ -146,7 +148,9 @@ export class SignUp extends React.Component {state = {
     const { username, password, email, phone_number, checked } = this.state
     try {
       f('/users/new_user/', {username: username, password: password, email: email, weeklyHours: 10}, 'post');
-      console.log('user successfully signed up!: ')
+      const data = f('/groups/getall/', 'get');
+      //console.log(data)
+      //console.log('user successfully signed up!: ')
     } catch (err) {
       console.log('error signing up: ', err)
     }
@@ -209,25 +213,41 @@ export class Groups extends React.Component{
   constructor() {
     super();
     this.state = {
-      search: ''
+      search: '',
+      data: ''
     };
-  };
+  }
+ async getData(){
+   await fetch('http://innoc21backend.herokuapp.com/users/getall')
+          .then((response) => response.json())
+        .then((responseJson) => {
+          console.log(responseJson)
+          this.setState({
+            data: responseJson
+          })
+        })
+}
+//let list = Object.keys(responseJson).map(key => ({[key]: responseJson[key]}));
+
+componentDidMount(){
+    this.getData()
+  }
 
   updateSearch = (search) => {
       this.setState({search: search}, () => {
-      console.log(this.state.search);
+        console.log(this.state.search)
     });
   };
+  searchItems = (search) =>{
+
+  };
+
   // this.setState() actually creates a new thread and code continues. We can re-write as: 
   updateSearchAsync = async (search) => {
     await this.setState({search: search});
-    console.log(this.state.search);
-    const data = f('/groups/getall/')
-    //console.log("It worked")
   };
-
+  
   preRenderReturn = (l) => {
-    console.log(this.state.search.trim());
     if(this.state.search.trim() != '') {
       let i = 0;
       while(i < l.length) {
@@ -241,70 +261,12 @@ export class Groups extends React.Component{
     return l;
   };
 
+  
   render() {
 
-    let list = [
-      {
-        name: 'Amy Farha',
-        avatar_url: 'https://s3.amazonaws.com/uifaces/faces/twitter/ladylexy/128.jpg',
-        subtitle: 'Vice President'
-      },
-      {
-        name: 'Chris Jackson',
-        avatar_url: 'https://s3.amazonaws.com/uifaces/faces/twitter/adhamdannaway/128.jpg',
-        subtitle: 'Vice Chairman'
-      },
-      {
-        name: 'Amy Farha',
-        avatar_url: 'https://s3.amazonaws.com/uifaces/faces/twitter/ladylexy/128.jpg',
-        subtitle: 'Vice President'
-      },
-      {
-        name: 'Chris Jackson',
-        avatar_url: 'https://s3.amazonaws.com/uifaces/faces/twitter/adhamdannaway/128.jpg',
-        subtitle: 'Vice Chairman'
-      },
-      {
-        name: 'Amy Farha',
-        avatar_url: 'https://s3.amazonaws.com/uifaces/faces/twitter/ladylexy/128.jpg',
-        subtitle: 'Vice President'
-      },
-      {
-        name: 'Chris Jackson',
-        avatar_url: 'https://s3.amazonaws.com/uifaces/faces/twitter/adhamdannaway/128.jpg',
-        subtitle: 'Vice Chairman'
-      },
-      {
-        name: 'Amy Farha',
-        avatar_url: 'https://s3.amazonaws.com/uifaces/faces/twitter/ladylexy/128.jpg',
-        subtitle: 'Vice President'
-      },
-      {
-        name: 'Chris Jackson',
-        avatar_url: 'https://s3.amazonaws.com/uifaces/faces/twitter/adhamdannaway/128.jpg',
-        subtitle: 'Vice Chairman'
-      },
-      {
-        name: 'Amy Farha',
-        avatar_url: 'https://s3.amazonaws.com/uifaces/faces/twitter/ladylexy/128.jpg',
-        subtitle: 'Vice President'
-      },
-      {
-        name: 'Chris Jackson',
-        avatar_url: 'https://s3.amazonaws.com/uifaces/faces/twitter/adhamdannaway/128.jpg',
-        subtitle: 'Vice Chairman'
-      },
-      {
-        name: 'Amy Farha',
-        avatar_url: 'https://s3.amazonaws.com/uifaces/faces/twitter/ladylexy/128.jpg',
-        subtitle: 'Vice President'
-      },
-      {
-        name: 'Chris Jackson',
-        avatar_url: 'https://s3.amazonaws.com/uifaces/faces/twitter/adhamdannaway/128.jpg',
-        subtitle: 'Vice Chairman'
-      },
-    ];
+        if(!this.state.data){
+          return <View />
+        }
 
     return (
       <View>
@@ -316,7 +278,7 @@ export class Groups extends React.Component{
         placeholder="Type Here..."
         onChangeText={this.updateSearchAsync}
         value={this.state.search}
-        // onIconPress = {(search) => this.searchItems(search)}
+        onIconPress = {(search) => this.searchItems(search)}
         />
         <ScrollView>
         <View
@@ -324,11 +286,15 @@ export class Groups extends React.Component{
         >
           
           {
-            this.preRenderReturn(list).map((l, i) => (
-              <ListItem key={i} bottomDivider>
+            this.preRenderReturn(this.state.data).map((l, i) => (
+              <ListItem key={i} bottomDivider
+              onPress={() => 
+                  Alert.alert(
+                    "It worked YeeHaw!"
+                  )}>
                 <Avatar source={{uri: l.avatar_url}} />
                 <ListItem.Content>
-                  <ListItem.Title>{l.name}</ListItem.Title>
+                  <ListItem.Title>{l.username}</ListItem.Title>
                   <ListItem.Subtitle>{l.subtitle}</ListItem.Subtitle>
                 </ListItem.Content>
               </ListItem>
@@ -336,8 +302,7 @@ export class Groups extends React.Component{
           }
         </View>
         </ScrollView>
-        
-      </View>
+        </View>
       
     );
   }
